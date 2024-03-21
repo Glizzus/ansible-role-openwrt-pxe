@@ -16,7 +16,6 @@
 
 - name: Enable automatic mounting of external USB storage
   ansible.builtin.blockinfile:
-    # TODO: Make device configurable
     content: |
       config global automount
               option from_fstab 1
