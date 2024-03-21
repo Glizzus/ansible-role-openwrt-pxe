@@ -7,6 +7,3 @@
 
 - name: Include tasks for prepare the USB files
   ansible.builtin.include_tasks: prepare-files.yml
-
-- name: Include tasks to configure dhcp server
-  ansible.builtin.include_tasks: configure-dhcp.yml
