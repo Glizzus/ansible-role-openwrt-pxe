@@ -4,7 +4,13 @@ An ansible role that installs and configures a PXE server for an OpenWRT DHCP se
 
 ## Requirements
 
-No special requirements; note that this role requires root access, so either run it in a playbook with a global become: yes, or invoke the role in your playbook like:
+The router must have a USB drive attached, and the USB drive must be formatted with a filesystem that supports large files (like ext4, exfat, or vfat).
+
+It is recommended that you check which device the USB drive is attached to, and set the `openwrt_pxe_device` variable accordingly.
+
+The target router must be the DHCP server for the network in order for this to be useful.
+
+Also, note that this role requires root access, so either run it in a playbook with a global become: yes, or invoke the role in your playbook like:
 
 ```yaml
 
