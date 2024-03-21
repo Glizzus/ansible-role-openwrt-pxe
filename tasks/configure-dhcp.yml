@@ -1,0 +1,13 @@
+# I would use an blockinfile for this, but the block already exists in the file.
+# These commands are idempotent enough anyway.
+- name: Configure dnsmasq to point to TFPT
+  ansible.builtin.command:
+    cmd: "uci set dhcp.@dnsmasq[0].{{ item.key }}={{ item.value }}"
+  with_dict:
+    enable_tftp: 1
+    tftp_root: "{{ openwrt_pxe_mountpoint }}/tftp"
+    dhcp_boot: netboot.xyz.efi
+  changed_when: true
+  notify:
+    - Commit uci
+    - Restart dnsmasq

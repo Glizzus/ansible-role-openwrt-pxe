@@ -1,0 +1,14 @@
+- name: Restart fstab-service
+  ansible.builtin.service:
+    name: fstab
+    state: restarted
+
+- name: Commit uci
+  ansible.builtin.command:
+    cmd: uci commit
+  changed_when: true
+
+- name: Restart dnsmasq
+  ansible.builtin.service:
+    name: dnsmasq
+    state: restarted

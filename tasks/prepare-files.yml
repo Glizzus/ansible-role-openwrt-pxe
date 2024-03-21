@@ -1,0 +1,12 @@
+- name: Create TFTP root directory on USB
+  ansible.builtin.file:
+    path: "{{ openwrt_pxe_mountpoint }}/tftp"
+    state: directory
+    mode: "0755"
+
+- name: Download netboot.xyz images
+  ansible.builtin.get_url:
+    url: "https://boot.netboot.xyz/ipxe/netboot.xyz.efi"
+    # TODO: Make mountpoint configurable
+    dest: "{{ openwrt_pxe_mountpoint }}/tftp/netboot.xyz.efi"
+    mode: "0644"

@@ -1,0 +1,12 @@
+- name: Bootstrap Python
+  ansible.builtin.raw: opkg update && opkg install python3
+  changed_when: true
+
+- name: Include tasks to set up mass storage
+  ansible.builtin.include_tasks: mass-storage.yml
+
+- name: Include tasks for prepare the USB files
+  ansible.builtin.include_tasks: prepare-files.yml
+
+- name: Include tasks to configure dhcp server
+  ansible.builtin.include_tasks: configure-dhcp.yml

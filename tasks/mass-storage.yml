@@ -1,0 +1,43 @@
+- name: Install USB-Support
+  community.general.opkg:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - usbutils
+    - kmod-usb-core
+    - block-mount
+    - "kmod-fs-{{ openwrt_pxe_usb_filesystem }}"
+
+- name: Create mountpoint
+  ansible.builtin.file:
+    path: "{{ openwrt_pxe_mountpoint }}"
+    state: directory
+    mode: '0755'
+
+- name: Enable automatic mounting of external USB storage
+  ansible.builtin.blockinfile:
+    # TODO: Make device configurable
+    content: |
+      config global automount
+              option from_fstab 1
+              option anon_mount 1
+
+      config global autoswap
+              option from_fstab 1
+              option anon_swap 0
+
+      config mount
+              option target {{ openwrt_pxe_mountpoint }}
+              option device {{ openwrt_pxe_device }}
+              option enabled 1
+              option enabled_fsck 0
+    path: /etc/config/fstab
+    create: true
+    mode: '0644'
+  notify: Restart fstab-service
+
+- name: Ensure fstab-service is enabled
+  ansible.builtin.service:
+    name: fstab
+    enabled: true
+  notify: Restart fstab-service
