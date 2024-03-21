@@ -1,0 +1,60 @@
+- name: Create TFTP root directory on USB
+  ansible.builtin.file:
+    path: "{{ openwrt_pxe_tftp_root }}"
+    state: directory
+    mode: "0755"
+
+- name: Create tmp directory on USB
+  ansible.builtin.file:
+    path: "{{ openwrt_pxe_mountpoint }}/tmp"
+    state: directory
+    mode: "0755"
+
+- name: Download netboot.xyz images
+  ansible.builtin.get_url:
+    url: "https://boot.netboot.xyz/ipxe/netboot.xyz.efi"
+    tmp_dest: "{{ openwrt_pxe_mountpoint }}/tmp"
+    dest: "{{ openwrt_pxe_tftp_root }}/netboot.xyz.efi"
+    mode: "0644"
+
+- name: Check if TFTP server is enabled
+  ansible.builtin.command: uci get dhcp.@dnsmasq[0].enable_tftp
+  register: tftp_enabled
+  failed_when: tftp_enabled.rc != 0 and 'Entry not found' not in tftp_enabled.stderr
+  changed_when: false
+
+- name: Set TFTP server if it is not set
+  ansible.builtin.command: uci set dhcp.@dnsmasq[0].enable_tftp='1'
+  when: tftp_enabled.stdout != '1'
+  changed_when: true
+  notify:
+  - Commit dhcp
+  - Restart dnsmasq
+
+- name: Check if TFTP root directory is set
+  ansible.builtin.command: uci get dhcp.@dnsmasq[0].tftp_root
+  register: tftp_root
+  failed_when: tftp_root.rc != 0 and 'Entry not found' not in tftp_root.stderr
+  changed_when: false
+
+- name: Set TFTP root directory
+  ansible.builtin.command: uci set dhcp.@dnsmasq[0].tftp_root="{{ openwrt_pxe_tftp_root }}"
+  when: tftp_root.stdout != openwrt_pxe_tftp_root
+  changed_when: true
+  notify:
+  - Commit dhcp
+  - Restart dnsmasq
+
+- name: Check current dhcp_boot image
+  ansible.builtin.command: uci get dhcp.@dnsmasq[0].dhcp_boot
+  register: dhcp_boot
+  failed_when: dhcp_boot.rc != 0 and 'Entry not found' not in dhcp_boot.stderr
+  changed_when: false
+
+- name: Set dhcp_boot image
+  ansible.builtin.command: uci set dhcp.@dnsmasq[0].dhcp_boot='netboot.xyz.efi'
+  when: dhcp_boot.stdout != 'netboot.xyz.efi'
+  changed_when: true
+  notify:
+  - Commit dhcp
+  - Restart dnsmasq

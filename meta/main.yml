@@ -1,0 +1,8 @@
+dependencies: []
+
+galaxy_info:
+  role_name: openwrt_pxe
+  author: glizzus
+  description: PXE Server for OpenWWRT
+  license: "MIT"
+  min_ansible_version: '2.4'

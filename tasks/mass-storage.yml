@@ -1,0 +1,60 @@
+- name: Install USB-Support packages
+  community.general.opkg:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - usbutils
+    - kmod-usb-core
+    - kmod-usb-storage
+    - block-mount
+    - kmod-fs-{{ openwrt_pxe_usb_filesystem }}
+
+- name: Check if anonymous mount is enabled
+  ansible.builtin.command:
+    cmd: uci get fstab.@global[0].anon_mount
+  register: anon_mount
+  ignore_errors: true
+
+- name: Enable anonymous mount
+  ansible.builtin.command:
+    cmd: uci set fstab.@global[0].anon_mount=1
+  when: anon_mount.stdout != "1"
+  notify:
+    - Commit fstab
+    - Boot fstab
+
+- name: Check if mount section exists
+  ansible.builtin.command:
+    cmd: uci show fstab.@mount[0]
+  register: usb_mount
+  ignore_errors: true
+
+- name: Create mount section
+  ansible.builtin.command:
+    cmd: uci add fstab mount
+  when: usb_mount.rc != 0
+  notify:
+    - Commit fstab
+    - Boot fstab
+
+- name: Enable USB drive mount
+  ansible.builtin.command:
+    cmd: "uci set fstab.@mount[0].enabled=1"
+  when: "'enabled=\"1\"' not in usb_mount.stdout"
+  notify:
+    - Commit fstab
+    - Boot fstab
+
+- name: Check if target is correct
+  ansible.builtin.command:
+    cmd: uci get fstab.@mount[0].target
+  register: target
+  ignore_errors: true
+
+- name: Set target
+  ansible.builtin.command:
+    cmd: uci set fstab.@mount[0].target={{ openwrt_pxe_mountpoint }}
+  when: target.stdout != openwrt_pxe_mountpoint
+  notify:
+    - Commit fstab
+    - Boot fstab
