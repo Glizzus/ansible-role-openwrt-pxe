@@ -7,5 +7,6 @@
 - name: Download netboot.xyz images
   ansible.builtin.get_url:
     url: "https://boot.netboot.xyz/ipxe/netboot.xyz.efi"
+    tmp_dest: "{{ openwrt_pxe_mountpoint }}/tmp"
     dest: "{{ openwrt_pxe_tftp_root }}/netboot.xyz.efi"
     mode: "0644"
