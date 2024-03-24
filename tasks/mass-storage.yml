@@ -30,18 +30,18 @@
               option target {{ openwrt_pxe_mountpoint }}
               option device {{ openwrt_pxe_device }}
               option enabled 1
-              option enabled_fsck 1
-              option options rw
+              option enabled_fsck 0
+              option options rw,sync
     path: /etc/config/fstab
     create: true
     mode: '0644'
-  notify: Restart fstab-service
+  notify: Boot fstab
 
 - name: Ensure fstab-service is enabled
   ansible.builtin.service:
     name: fstab
     enabled: true
-  notify: Restart fstab-service
+  notify: Boot fstab
 
 - name: Flush handlers
   ansible.builtin.meta: flush_handlers

@@ -1,4 +1,3 @@
-- name: Restart fstab-service
-  ansible.builtin.service:
-    name: fstab
-    state: restarted
+- name: Boot fstab
+  ansible.builtin.command: service fstab boot
+  changed_when: true
