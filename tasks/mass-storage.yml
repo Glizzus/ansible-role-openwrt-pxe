@@ -5,8 +5,9 @@
   loop:
     - usbutils
     - kmod-usb-core
+    - kmod-usb-storage
     - block-mount
-    - "kmod-fs-{{ openwrt_pxe_usb_filesystem }}"
+    - kmod-fs-{{ openwrt_pxe_usb_filesystem }}
 
 - name: Create mountpoint
   ansible.builtin.file:
