@@ -41,3 +41,6 @@
     name: fstab
     enabled: true
   notify: Restart fstab-service
+
+- name: Flush handlers
+  ansible.builtin.meta: flush_handlers
