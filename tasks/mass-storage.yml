@@ -18,10 +18,12 @@
   ansible.builtin.command: uci set fstab.@global[0].anon_mount=1
   when: anon_mount.stdout != "1"
   changed_when: true
-  notify: Boot fstab
+  notify:
+    - Commit fstab
+    - Boot fstab
 
 - name: Check if USB drive mount is enabled
-  ansible.builtin.command: uci get fstab.@mount[0].enabled=1
+  ansible.builtin.command: uci get fstab.@mount[0].enabled
   register: usb_mount
   changed_when: false
 
@@ -29,7 +31,9 @@
   ansible.builtin.command: uci set fstab.@mount[0].enabled=1
   when: usb_mount.stdout != "1"
   changed_when: true
-  notify: Boot fstab
+  notify:
+    - Commit fstab
+    - Boot fstab
 
 - name: Detect if target is correct
   ansible.builtin.command: uci get fstab.@mount[0].target
@@ -40,4 +44,6 @@
   ansible.builtin.command: uci set fstab.@mount[0].target={{ openwrt_pxe_usb_mountpoint }}
   when: target.stdout != openwrt_pxe_usb_mountpoint
   changed_when: true
-  notify: Boot fstab
+  notify:
+    - Commit fstab
+    - Boot fstab

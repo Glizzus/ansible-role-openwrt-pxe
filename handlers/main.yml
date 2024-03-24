@@ -1,3 +1,7 @@
+- name: Commit fstab
+  ansible.builtin.command: uci commit fstab
+  changed_when: true
+
 - name: Boot fstab
   ansible.builtin.command: service fstab boot
   changed_when: true
