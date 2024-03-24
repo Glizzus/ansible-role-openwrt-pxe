@@ -41,7 +41,7 @@
   changed_when: false
 
 - name: Set target
-  ansible.builtin.command: uci set fstab.@mount[0].target={{ openwrt_pxe_usb_mountpoint }}
+  ansible.builtin.command: uci set fstab.@mount[0].target={{ openwrt_pxe_mountpoint }}
   when: target.stdout != openwrt_pxe_usb_mountpoint
   changed_when: true
   notify:
