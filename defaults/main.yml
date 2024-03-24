@@ -1,4 +1,4 @@
 openwrt_pxe_usb_filesystem: ext4
-openwrt_pxe_mountpoint: /mnt/extstorage
 openwrt_pxe_device: /dev/sda1
+openwrt_pxe_mountpoint: "{{ openwrt_pxe_device | regex_replace('/dev/', '/mnt/') }}"
 openwrt_pxe_tftp_root: "{{ openwrt_pxe_mountpoint }}/tftp"

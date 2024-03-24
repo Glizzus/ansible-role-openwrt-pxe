@@ -31,16 +31,16 @@ openwrt_pxe_usb_filesystem: ext4
 The filesystem of the USB drive. You may need to change this to `vfat`, `exfat`, or other common filesystems.
 
 ```yaml
-openwrt_pxe_mountpoint: /mnt/extstorage
-```
-
-The mountpoint of the USB drive. This is where the PXE server will store the OpenWRT images.
-
-```yaml
 openwrt_pxe_device: /dev/sda1
 ```
 
 The device of the USB drive. This is where the PXE server will store the OpenWRT images.
+
+```yaml
+openwrt_pxe_mountpoint: "{{ openwrt_pxe_device | regex_replace('/dev/', '/mnt/') }}"
+```
+
+The mountpoint of the USB drive. This is where the PXE server will store the OpenWRT images.
 
 ## Dependencies
 

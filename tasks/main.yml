@@ -5,5 +5,8 @@
 - name: Include tasks to set up mass storage
   ansible.builtin.include_tasks: mass-storage.yml
 
+- name: Flush handlers
+  ansible.builtin.meta: flush_handlers
+
 - name: Include tasks for prepare the USB files
   ansible.builtin.include_tasks: prepare-files.yml

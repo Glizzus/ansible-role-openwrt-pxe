@@ -9,39 +9,35 @@
     - block-mount
     - kmod-fs-{{ openwrt_pxe_usb_filesystem }}
 
-- name: Create mountpoint
-  ansible.builtin.file:
-    path: "{{ openwrt_pxe_mountpoint }}"
-    state: directory
-    mode: '0755'
+- name: Check if anonymous mount is enabled
+  ansible.builtin.command: uci get fstab.@global[0].anon_mount
+  register: anon_mount
+  changed_when: false
 
-- name: Enable automatic mounting of external USB storage
-  ansible.builtin.blockinfile:
-    content: |
-      config global automount
-              option from_fstab 1
-              option anon_mount 1
-
-      config global autoswap
-              option from_fstab 1
-              option anon_swap 0
-
-      config mount
-              option target {{ openwrt_pxe_mountpoint }}
-              option device {{ openwrt_pxe_device }}
-              option enabled 1
-              option enabled_fsck 0
-              option options rw,sync
-    path: /etc/config/fstab
-    create: true
-    mode: '0644'
+- name: Enable anonymous mount
+  ansible.builtin.command: uci set fstab.@global[0].anon_mount=1
+  when: anon_mount.stdout != "1"
+  changed_when: true
   notify: Boot fstab
 
-- name: Ensure fstab-service is enabled
-  ansible.builtin.service:
-    name: fstab
-    enabled: true
+- name: Check if USB drive mount is enabled
+  ansible.builtin.command: uci get fstab.@mount[0].enabled=1
+  register: usb_mount
+  changed_when: false
+
+- name: Enable USB drive mount
+  ansible.builtin.command: uci set fstab.@mount[0].enabled=1
+  when: usb_mount.stdout != "1"
+  changed_when: true
   notify: Boot fstab
 
-- name: Flush handlers
-  ansible.builtin.meta: flush_handlers
+- name: Detect if target is correct
+  ansible.builtin.command: uci get fstab.@mount[0].target
+  register: target
+  changed_when: false
+
+- name: Set target
+  ansible.builtin.command: uci set fstab.@mount[0].target={{ openwrt_pxe_usb_mountpoint }}
+  when: target.stdout != openwrt_pxe_usb_mountpoint
+  changed_when: true
+  notify: Boot fstab
