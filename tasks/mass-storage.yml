@@ -30,7 +30,8 @@
               option target {{ openwrt_pxe_mountpoint }}
               option device {{ openwrt_pxe_device }}
               option enabled 1
-              option enabled_fsck 0
+              option enabled_fsck 1
+              option options rw
     path: /etc/config/fstab
     create: true
     mode: '0644'
