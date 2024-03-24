@@ -4,6 +4,12 @@
     state: directory
     mode: "0755"
 
+- name: Create tmp directory on USB
+  ansible.builtin.file:
+    path: "{{ openwrt_pxe_mountpoint }}/tmp"
+    state: directory
+    mode: "0755"
+
 - name: Download netboot.xyz images
   ansible.builtin.get_url:
     url: "https://boot.netboot.xyz/ipxe/netboot.xyz.efi"
