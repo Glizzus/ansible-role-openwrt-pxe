@@ -28,7 +28,7 @@
   when: tftp_enabled.stdout != '1'
   changed_when: true
   notify:
-    - Uci commit dhcp
+    - Commit dhcp
     - Restart dnsmasq
 
 - name: Check if TFTP root directory is set
@@ -42,5 +42,5 @@
   when: tftp_root.stdout != openwrt_pxe_tftp_root
   changed_when: true
   notify:
-    - Uci commit dhcp
+    - Commit dhcp
     - Restart dnsmasq
