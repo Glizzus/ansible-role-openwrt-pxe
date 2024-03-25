@@ -16,3 +16,31 @@
     tmp_dest: "{{ openwrt_pxe_mountpoint }}/tmp"
     dest: "{{ openwrt_pxe_tftp_root }}/netboot.xyz.efi"
     mode: "0644"
+
+- name: Check if TFTP server is enabled
+  ansible.builtin.command: uci get dhcp.@dnsmasq[0].enable_tftp
+  register: tftp_enabled
+  failed_when: tftp_enabled.rc != 0 and 'Entry not found' not in tftp_enabled.stderr
+  changed_when: false
+
+- name: Set TFTP server if it is not set
+  ansible.builtin.command: uci set dhcp.@dnsmasq[0].enable_tftp='1'
+  when: tftp_enabled.stdout != '1'
+  changed_when: true
+  notify:
+    - Uci commit dhcp
+    - Restart dnsmasq
+
+- name: Check if TFTP root directory is set
+  ansible.builtin.command: uci get dhcp.@dnsmasq[0].tftp_root
+  register: tftp_root
+  failed_when: tftp_root.rc != 0 and 'Entry not found' not in tftp_root.stderr
+  changed_when: false
+
+- name: Set TFTP root directory
+  ansible.builtin.command: uci set dhcp.@dnsmasq[0].tftp_root="{{ openwrt_pxe_tftp_root }}"
+  when: tftp_root.stdout != openwrt_pxe_tftp_root
+  changed_when: true
+  notify:
+    - Uci commit dhcp
+    - Restart dnsmasq
