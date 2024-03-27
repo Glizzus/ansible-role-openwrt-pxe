@@ -44,3 +44,17 @@
   notify:
     - Commit dhcp
     - Restart dnsmasq
+
+- name: Check current dhcp_boot image
+  ansible.builtin.command: uci get dhcp.@dnsmasq[0].dhcp_boot
+  register: dhcp_boot
+  failed_when: dhcp_boot.rc != 0 and 'Entry not found' not in dhcp_boot.stderr
+  changed_when: false
+
+- name: Set dhcp_boot image
+  ansible.builtin.command: uci set dhcp.@dnsmasq[0].dhcp_boot='netboot.xyz.efi'
+  when: dhcp_boot.stdout != 'netboot.xyz.efi'
+  changed_when: true
+  notify:
+    - Commit dhcp
+    - Restart dnsmasq
